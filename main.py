@@ -6,7 +6,7 @@ import modules.flock as flock
 import modules.render as render
 
 render = render.Render()
-flock = flock.Flock()
+flock = flock.Flock(num_boids=50)
 
 running = True
 
