@@ -4,7 +4,7 @@ import modules.fenetre as fenetre
 class Flock():
 
     def __init__(self) -> None:
-        self.num_boids = 5
+        self.num_boids = 50
         self.boid_speed = 2
 
         #initialisation des positions et vitesses des Boids 
@@ -16,15 +16,23 @@ class Flock():
 
         
         
-    def update_positions(self,coeff_alignement= 1, coeff_separation= 1.5, coeff_cohesion= 1) -> None:
+    def update_positions(self,coeff_alignement= 1, coeff_separation= 1.5, coeff_cohesion= 1, max_speed= 2) -> None:
         """
         met a jour la matrice de postions des boids
         """
-        alignement_velocities_force = self.alignement(perception_radius = 50, max_steering_force = 0.2)
+        alignement_velocities_force = self.alignement(perception_radius = 25, max_steering_force = 0.2)
         separation_velocities_force = - alignement_velocities_force
-        cohesion_velocities_force = self.cohesion(perception_radius = 50, max_steering_force = 0.2)
+        cohesion_velocities_force = self.cohesion(perception_radius = 10, max_steering_force = 0.2)
 
-        self.velocities += coeff_alignement*alignement_velocities_force + coeff_separation*separation_velocities_force + coeff_cohesion*cohesion_velocities_force + self.avoid_walls()#on fait += -> car c'est un ajout de steering force -donc la force de correction de traj
+        new_velocities = self.velocities + coeff_alignement*alignement_velocities_force + coeff_separation*separation_velocities_force + coeff_cohesion*cohesion_velocities_force + self.avoid_walls()#on fait += -> car c'est un ajout de steering force -donc la force de correction de traj
+
+        #limitation de la vitesse des boids
+        boid_speeds = np.linalg.norm(new_velocities, axis=0)  # Calcule la vitesse de chaque Boid - stocké dans une liste
+        #print(speeds)
+        too_fast = boid_speeds > max_speed
+        new_velocities[:, too_fast] = new_velocities[:, too_fast] / boid_speeds[too_fast] * max_speed
+
+        self.velocities = new_velocities
         self.positions += self.velocities * self.boid_speed
 
     def alignement(self, perception_radius, max_steering_force) -> np.array:
