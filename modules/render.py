@@ -13,10 +13,10 @@ class Render():
 
         self.clock = pygame.time.Clock() #pour controller fps
 
-    def update_render(self, f: "Flock") -> None:
+    def update_render(self, flock: "Flock") -> None:
         self.screen.fill((255, 255, 255))
-        for i in range(f.num_boids):
-            pygame.draw.circle(self.screen, self.boid_color, (int(f.positions[0, i]), int(f.positions[1, i])), self.boid_size)
+        for i in range(flock.num_boids):
+            pygame.draw.circle(self.screen, self.boid_color, (int(flock.positions[0, i]), int(flock.positions[1, i])), self.boid_size)
 
         pygame.display.update()
         self.clock.tick(60)   #60 fps
