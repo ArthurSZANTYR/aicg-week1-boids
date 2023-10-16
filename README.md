@@ -1,6 +1,11 @@
 # aicg-week1-boids
 Simulates the flocking behaviour of birds following Craig Reynolds' rules
 
+<p align="center">
+  <img src="https://github.com/ArthurSZANTYR/aicg-week1-boids/blob/main/examples/vast-bird-shaped-murmuration-flock-of-starlings.png" alt="Bird Flock" width="300">
+</p>
+
+
 ## Goals
 I realized this project as a part of the AICG course week1 from the IFT program. I had to render a "*Boids*" simulation following Craig Reynolds' rules.
 
@@ -28,7 +33,10 @@ __Usage__
 * You can modify parameters such as the number of boids and their maximum speed when creating the Flock instance in the main.py files
 
 __Simulation test__
-![alt text](https://github.com/ArthurSZANTYR/aicg-week1-boids/examples/boids_simulation_50.gif)
+
+<p align="center">
+  <img src="https://github.com/ArthurSZANTYR/aicg-week1-boids/blob/main/examples/boids_simulation_50.gif" alt="Boids Simulation" width="400">
+</p>
 
 
 ## Project Structure
