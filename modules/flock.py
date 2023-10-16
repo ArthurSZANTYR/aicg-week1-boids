@@ -3,9 +3,11 @@ import modules.fenetre as fenetre
 
 class Flock():
 
-    def __init__(self) -> None:
-        self.num_boids = 50
-        self.boid_speed = 2
+    def __init__(self, num_boids = 50, boid_speed = 2, max_speed =2, perception_radius= 50) -> None:
+        self.num_boids = num_boids
+        self.boid_speed = boid_speed
+        self.max_speed = max_speed
+        self.perception_radius = perception_radius
 
         #initialisation des positions et vitesses des Boids 
         self.positions = np.random.rand(2, self.num_boids)   #random.rand -> entre (0 et 1)     # (2, num_boids) -> 2 lignes , n colonnes
@@ -16,26 +18,26 @@ class Flock():
 
         
         
-    def update_positions(self,coeff_alignement= 1, coeff_separation= 1.5, coeff_cohesion= 1, max_speed= 2) -> None:
+    def update_positions(self,coeff_alignement= 1.25, coeff_separation= 1.7, coeff_cohesion= 1) -> None:
         """
-        met a jour la matrice de postions des boids
+        met a jour la matrice de positions des boids
         """
-        alignement_velocities_force = self.alignement(perception_radius = 25, max_steering_force = 0.2)
+        alignement_velocities_force = self.alignement()
         separation_velocities_force = - alignement_velocities_force
-        cohesion_velocities_force = self.cohesion(perception_radius = 10, max_steering_force = 0.2)
+        cohesion_velocities_force = self.cohesion()
 
         new_velocities = self.velocities + coeff_alignement*alignement_velocities_force + coeff_separation*separation_velocities_force + coeff_cohesion*cohesion_velocities_force + self.avoid_walls()#on fait += -> car c'est un ajout de steering force -donc la force de correction de traj
 
         #limitation de la vitesse des boids
-        boid_speeds = np.linalg.norm(new_velocities, axis=0)  # Calcule la vitesse de chaque Boid - stocké dans une liste
+        boid_speeds = np.linalg.norm(new_velocities, axis=0)  # Calcule la vitesse = (norme de la velocité) - de chaque Boid - stocké dans une liste
         #print(speeds)
-        too_fast = boid_speeds > max_speed
-        new_velocities[:, too_fast] = new_velocities[:, too_fast] / boid_speeds[too_fast] * max_speed
+        too_fast = boid_speeds > self.max_speed
+        new_velocities[:, too_fast] = new_velocities[:, too_fast] / boid_speeds[too_fast] * self.max_speed #on s'interesse a modifier seulement les boids too fast
 
         self.velocities = new_velocities
         self.positions += self.velocities * self.boid_speed
 
-    def alignement(self, perception_radius, max_steering_force) -> np.array:
+    def alignement(self, max_steering_force = 0.2) -> np.array:
         """
         retourne les forces de correction necessaires - pour suivre un comportment d'alignement
         """
@@ -54,7 +56,7 @@ class Flock():
                     other_boid_velocity = self.velocities[:, j]
 
                     distance = np.linalg.norm(other_boid_position - current_boid_position)   #np.linalg.norm -> calcule norme d'un vecteur = sa distanceentre 2 vecteurs soustrait
-                    if distance < perception_radius:    #perception radius -> rayon de vision des boids
+                    if distance < self.perception_radius:    #perception radius -> rayon de vision des boids
                         current_boid_neighbors_velocity.append(other_boid_velocity)
 
             if current_boid_neighbors_velocity: #renvoie True si la liste n'est pas vide
@@ -69,7 +71,7 @@ class Flock():
 
         return aligned_velocities
     
-    def cohesion(self, perception_radius, max_steering_force) -> np.array:
+    def cohesion(self, max_steering_force = 0.2) -> np.array:
         """
         retourne les forces de correction necesaires - pour suivre un comportement d'alignement 
         -> les boid se dirige vers la positions moyennes des boids voisins
@@ -85,7 +87,7 @@ class Flock():
                 if i!=j:
                     other_boid_position = self.positions[:,j]
                     distance = np.linalg.norm(current_boid_position - other_boid_position)
-                    if distance < perception_radius:
+                    if distance < self.perception_radius:
                         current_boid_neighbors_position.append(other_boid_position)
 
             if current_boid_neighbors_position:
